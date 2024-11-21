@@ -1,0 +1,32 @@
+
+Model Info:
+ function:     stan_glm
+ family:       gaussian [identity]
+ formula:      wti_price ~ date
+ algorithm:    sampling
+ sample:       4000 (posterior sample size)
+ priors:       see help('prior_summary')
+ observations: 33
+ predictors:   2
+
+Estimates:
+              mean   sd     10%    50%    90% 
+(Intercept) 2331.1  529.2 1655.7 2338.2 2992.0
+date          -0.1    0.0   -0.1   -0.1   -0.1
+sigma          2.1    0.3    1.8    2.1    2.5
+
+Fit Diagnostics:
+           mean   sd   10%   50%   90%
+mean_PPD 71.2    0.5 70.5  71.2  71.8 
+
+The mean_ppd is the sample average posterior predictive distribution of the outcome variable (for details see help('summary.stanreg')).
+
+MCMC diagnostics
+              mcse Rhat n_eff
+(Intercept)   9.8  1.0  2931 
+date          0.0  1.0  2931 
+sigma         0.0  1.0  3462 
+mean_PPD      0.0  1.0  3838 
+log-posterior 0.0  1.0  1739 
+
+For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).
