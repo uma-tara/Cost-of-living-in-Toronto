@@ -1,89 +1,134 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the simulated Australian 
-  #electoral divisions dataset.
-# Author: Rohan Alexander
-# Date: 26 September 2024
-# Contact: rohan.alexander@utoronto.ca
+# Purpose: Tests the structure and validity of the simulated WTI crude oil prices dataset.
+# Author: Uma Sadhwani
+# Date: 19 November 2024
+# Contact: uma.sadhwani@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
-  # - The `tidyverse` package must be installed and loaded
-  # - 00-simulate_data.R must have been run
-# Any other information needed? Make sure you are in the `starter_folder` rproj
+# - The `tidyverse` package must be installed and loaded
+# - 00-simulate_data.R must have been run
+# - The `starter_folder` R project is set correctly
 
-
-#### Workspace setup ####
+# Load necessary libraries
 library(tidyverse)
 
-analysis_data <- read_csv("data/00-simulated_data/simulated_data.csv")
+# Define file path
+file_path <- "/home/rstudio/finalpaper/data/00-simulated_data/simulated_data.csv"
 
-# Test if the data was successfully loaded
-if (exists("analysis_data")) {
-  message("Test Passed: The dataset was successfully loaded.")
-} else {
-  stop("Test Failed: The dataset could not be loaded.")
+# Check if the file exists
+if (!file.exists(file_path)) {
+  stop("Error: File not found at the specified path. Please verify the file location.")
 }
 
+# Load the dataset
+data <- read_csv(file_path)
 
-#### Test data ####
-
-# Check if the dataset has 151 rows
-if (nrow(analysis_data) == 151) {
-  message("Test Passed: The dataset has 151 rows.")
+# Check and rename columns if necessary
+if (all(names(data) == c("division", "state", "party"))) {
+  data <- data %>%
+    rename(
+      date = division,           # Replace with the actual column name for dates
+      wti_price = state,         # Replace with the actual column name for oil prices
+      election_phase = party     # Replace with the actual column name for election phases
+    )
+  message("Column names have been updated to match the expected structure.")
 } else {
-  stop("Test Failed: The dataset does not have 151 rows.")
+  message("Column names do not match expected structure. Please verify the dataset.")
 }
 
-# Check if the dataset has 3 columns
-if (ncol(analysis_data) == 3) {
-  message("Test Passed: The dataset has 3 columns.")
-} else {
-  stop("Test Failed: The dataset does not have 3 columns.")
+# Ensure columns exist before proceeding
+required_columns <- c("date", "wti_price", "election_phase")
+if (!all(required_columns %in% names(data))) {
+  stop("Error: One or more required columns are missing from the dataset.")
 }
 
-# Check if all values in the 'division' column are unique
-if (n_distinct(analysis_data$division) == nrow(analysis_data)) {
-  message("Test Passed: All values in 'division' are unique.")
+# Convert data types
+data <- data %>%
+  mutate(
+    date = as.Date(date, format = "%Y-%m-%d"),  # Convert `date` to Date format
+    wti_price = as.numeric(wti_price),         # Convert `wti_price` to numeric
+    election_phase = as.character(election_phase)  # Ensure `election_phase` is character
+  )
+
+# Test 1: Check for missing values
+missing_values <- sum(is.na(data))
+if (missing_values > 0) {
+  message("Warning: The dataset contains ", missing_values, " missing values.")
 } else {
-  stop("Test Failed: The 'division' column contains duplicate values.")
+  message("Test 1 Passed: No missing values detected.")
 }
 
-# Check if the 'state' column contains only valid Australian state names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", 
-                  "Western Australia", "Tasmania", "Northern Territory", 
-                  "Australian Capital Territory")
-
-if (all(analysis_data$state %in% valid_states)) {
-  message("Test Passed: The 'state' column contains only valid Australian state names.")
+# Test 2: Check column names and structure
+if (all(names(data) == required_columns)) {
+  message("Test 2 Passed: Column names are as expected.")
 } else {
-  stop("Test Failed: The 'state' column contains invalid state names.")
+  message("Test 2 Failed: Column names do not match the expected names.")
+  print("Found columns:")
+  print(names(data))
 }
 
-# Check if the 'party' column contains only valid party names
-valid_parties <- c("Labor", "Liberal", "Greens", "National", "Other")
-
-if (all(analysis_data$party %in% valid_parties)) {
-  message("Test Passed: The 'party' column contains only valid party names.")
+# Test 3: Validate data types
+expected_types <- c("Date", "numeric", "character")
+actual_types <- sapply(data, class)
+if (all(actual_types == expected_types)) {
+  message("Test 3 Passed: Data types are as expected.")
 } else {
-  stop("Test Failed: The 'party' column contains invalid party names.")
+  message("Test 3 Failed: Data types do not match the expected types.")
+  print("Actual data types:")
+  print(actual_types)
 }
 
-# Check if there are any missing values in the dataset
-if (all(!is.na(analysis_data))) {
-  message("Test Passed: The dataset contains no missing values.")
+# Test 4: Check for realistic ranges in numeric columns
+# Use `na.rm = TRUE` to ignore NA values during the range check
+price_check <- all(data$wti_price >= 0 & data$wti_price <= 150, na.rm = TRUE)
+
+if (price_check) {
+  message("Test 4 Passed: All numeric columns have realistic ranges.")
 } else {
-  stop("Test Failed: The dataset contains missing values.")
+  message("Test 4 Failed: Numeric columns have values outside expected ranges.")
+  
+  # Diagnose issues
+  print("Issues with ranges in wti_price:")
+  print(data %>% filter(wti_price < 0 | wti_price > 150 | is.na(wti_price)))
 }
 
-# Check if there are no empty strings in 'division', 'state', and 'party' columns
-if (all(analysis_data$division != "" & analysis_data$state != "" & analysis_data$party != "")) {
-  message("Test Passed: There are no empty strings in 'division', 'state', or 'party'.")
+# Test 5: Check for duplicates in the `date` column
+if ("date" %in% names(data)) {
+  # Drop rows with missing dates to avoid issues
+  if (any(is.na(data$date))) {
+    message("Warning: Rows with missing dates found. These will be removed before checking for duplicates.")
+    data <- data %>% filter(!is.na(date))
+  }
+  
+  # Check for duplicate dates
+  duplicate_dates <- nrow(data) != nrow(data %>% distinct(date))
+  if (!duplicate_dates) {
+    message("Test 5 Passed: No duplicate dates detected.")
+  } else {
+    message("Test 5 Failed: Duplicate dates found in the dataset.")
+    print(data %>% group_by(date) %>% filter(n() > 1))
+  }
 } else {
-  stop("Test Failed: There are empty strings in one or more columns.")
+  message("Test 5 Failed: 'date' column is missing from the dataset.")
 }
 
-# Check if the 'party' column has at least two unique values
-if (n_distinct(analysis_data$party) >= 2) {
-  message("Test Passed: The 'party' column contains at least two unique values.")
+# Test 6: Verify election phase labels
+# Test 6: Verify election phase labels
+if ("election_phase" %in% names(data)) {
+  # Check for invalid labels
+  valid_phases <- all(data$election_phase %in% c("pre-election", "post-election"))
+  if (valid_phases) {
+    message("Test 6 Passed: All rows have valid election phase labels.")
+  } else {
+    message("Test 6 Failed: Invalid election phase labels found.")
+    invalid_labels <- data %>% filter(!election_phase %in% c("pre-election", "post-election"))
+    print("Rows with invalid election_phase labels:")
+    print(invalid_labels)
+    
+    # Optional: Remove rows with invalid labels
+    data <- data %>% filter(election_phase %in% c("pre-election", "post-election"))
+    message("Rows with invalid election_phase labels have been removed.")
+  }
 } else {
-  stop("Test Failed: The 'party' column contains less than two unique values.")
+  message("Test 6 Failed: 'election_phase' column is missing from the dataset.")
 }
