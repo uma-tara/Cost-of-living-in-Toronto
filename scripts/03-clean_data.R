@@ -1,44 +1,39 @@
 #### Preamble ####
-# Purpose: Cleans the raw plane data recorded by two observers..... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 6 April 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Cleans the raw dataset of Western Texas Intermediate crude oil prices
+# over a given period, monitoring differences in prices closer and closer to Donald Trump's election.
+# Author: Uma Sadhwani
+# Date: 18 November 2024
+# Contact: uma.sadhwani@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: The tidyverse package must be installed.
+# Ensure you are in the starter_folder R project.
 
 #### Workspace setup ####
 library(tidyverse)
+library(janitor)
+
+#### Load raw data ####
+# Adjust the file path if necessary
+raw_data <- read_csv("/home/rstudio/finalpaper/data/01-raw_data/raw_data.csv")
 
 #### Clean data ####
-raw_data <- read_csv("inputs/data/plane_data.csv")
-
-cleaned_data <-
-  raw_data |>
-  janitor::clean_names() |>
-  select(wing_width_mm, wing_length_mm, flying_time_sec_first_timer) |>
-  filter(wing_width_mm != "caw") |>
+analysis_data <- raw_data |>
+  janitor::clean_names() |> # Standardize column names
   mutate(
-    flying_time_sec_first_timer = if_else(flying_time_sec_first_timer == "1,35",
-                                   "1.35",
-                                   flying_time_sec_first_timer)
+    date = as.Date(date, format = "%Y-%m-%d"), # Ensure the date column is in Date format
+    price = as.numeric(dcoilwtico) # Convert price column to numeric
   ) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "490",
-                                 "49",
-                                 wing_width_mm)) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "6",
-                                 "60",
-                                 wing_width_mm)) |>
-  mutate(
-    wing_width_mm = as.numeric(wing_width_mm),
-    wing_length_mm = as.numeric(wing_length_mm),
-    flying_time_sec_first_timer = as.numeric(flying_time_sec_first_timer)
-  ) |>
-  rename(flying_time = flying_time_sec_first_timer,
-         width = wing_width_mm,
-         length = wing_length_mm
-         ) |> 
-  tidyr::drop_na()
+  filter(!is.na(price)) |> # Remove rows where the price is NA
+  rename(wti_price = price) |> # Rename for clarity
+  arrange(date) # Sort by date
 
-#### Save data ####
-write_csv(cleaned_data, "outputs/data/analysis_data.csv")
+#### Save cleaned data ####
+# Ensure the output directory exists
+if (!dir.exists("/home/rstudio/finalpaper/data/02-analysis_data")) {
+  dir.create("/home/rstudio/finalpaper/data/02-analysis_data", recursive = TRUE)
+}
+
+write_csv(analysis_data, "/home/rstudio/finalpaper/data/02-analysis_data/analysis_data.csv")
+
+#### Display a message ####
+cat("Data cleaning complete. Cleaned data saved to '/home/rstudio/finalpaper/data/02-analysis_data/analysis_data.csv'\n")
