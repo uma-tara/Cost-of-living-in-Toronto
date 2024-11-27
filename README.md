@@ -2,8 +2,7 @@
 
 ## Overview
 
-This repo provides students with a foundation for their own projects associated with *Telling Stories with Data*. You do not need every aspect for every paper and you should delete aspects that you do not need.
-
+This study examines the performance of West Texas Intermediate (WTI) crude oil prices from October 1, 2024 (pre-election), to November 18, 2024 (post-election). It focuses on assessing the impact of market speculation regarding potential tariffs imposed by the Trump administration post-election. The analysis aims to uncover how such speculation influenced crude oil price fluctuations during this period.
 
 ## File Structure
 
