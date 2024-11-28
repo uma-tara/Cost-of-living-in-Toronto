@@ -70,9 +70,92 @@ ggplot(analysis_data_monthly, aes(x = month, y = avg_price)) +
   ) +
   theme_minimal()
 
-#### Save Aggregated Data ####
-# Save the monthly aggregated data for further analysis
-write_csv(analysis_data_monthly, "/home/rstudio/finalpaper/data/02-analysis_data/analysis_data_monthly.csv")
+#### Additional Statistical Charts and Tables ####
+
+# 7. Rolling Average WTI Prices (7-day moving average)
+analysis_data <- analysis_data %>%
+  arrange(date) %>%
+  mutate(rolling_avg = zoo::rollmean(wti_price, k = 7, fill = NA, align = "right"))
+
+ggplot(analysis_data, aes(x = date)) +
+  geom_line(aes(y = wti_price), color = "grey", alpha = 0.7) +
+  geom_line(aes(y = rolling_avg), color = "blue") +
+  labs(
+    title = "WTI Crude Oil Prices with 7-Day Rolling Average",
+    x = "Date",
+    y = "Price (USD per barrel)"
+  ) +
+  theme_minimal()
+
+# 8. Price Volatility (Daily Percentage Change)
+analysis_data <- analysis_data %>%
+  mutate(daily_pct_change = 100 * (wti_price - lag(wti_price)) / lag(wti_price))
+
+ggplot(analysis_data, aes(x = date, y = daily_pct_change)) +
+  geom_line(color = "red", alpha = 0.7) +
+  labs(
+    title = "Daily Percentage Change in WTI Crude Oil Prices",
+    x = "Date",
+    y = "Percentage Change (%)"
+  ) +
+  theme_minimal()
+
+# 9. Correlation Matrix
+# Check if other numerical columns exist to calculate correlations
+numeric_data <- analysis_data %>%
+  select(where(is.numeric)) %>%
+  na.omit()  # Remove rows with NA for correlation calculation
+
+correlation_matrix <- cor(numeric_data)
+print("Correlation Matrix:")
+print(correlation_matrix)
+
+# Heatmap of the Correlation Matrix
+heatmap(correlation_matrix, main = "Correlation Heatmap", symm = TRUE, col = colorRampPalette(c("blue", "white", "red"))(100))
+
+# 10. Summary Table: WTI Prices by Election Phase
+#### Create Election Phase Column ####
+election_date <- as.Date("2024-11-05")
+
+analysis_data <- analysis_data %>%
+  mutate(
+    election_phase = ifelse(date < election_date, "pre-election", "post-election")
+  )
+
+#### Summary Table: WTI Prices by Election Phase ####
+summary_table <- analysis_data %>%
+  group_by(election_phase) %>%
+  summarise(
+    min_price = min(wti_price, na.rm = TRUE),
+    max_price = max(wti_price, na.rm = TRUE),
+    avg_price = mean(wti_price, na.rm = TRUE),
+    median_price = median(wti_price, na.rm = TRUE),
+    sd_price = sd(wti_price, na.rm = TRUE)
+  )
+print(summary_table)
+
+summary_table <- analysis_data %>%
+  group_by(election_phase) %>%
+  summarise(
+    min_price = min(wti_price, na.rm = TRUE),
+    max_price = max(wti_price, na.rm = TRUE),
+    avg_price = mean(wti_price, na.rm = TRUE),
+    median_price = median(wti_price, na.rm = TRUE),
+    sd_price = sd(wti_price, na.rm = TRUE)
+  )
+print("Summary Table by Election Phase:")
+print(summary_table)
+
+# 11. Boxplot Comparison by Election Phase
+ggplot(analysis_data, aes(x = election_phase, y = wti_price, fill = election_phase)) +
+  geom_boxplot() +
+  labs(
+    title = "WTI Crude Oil Prices by Election Phase",
+    x = "Election Phase",
+    y = "Price (USD per barrel)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
 
 #### Display completion message ####
-cat("Exploratory Data Analysis completed. Aggregated data saved to '/home/rstudio/finalpaper/data/02-analysis_data/analysis_data_monthly.csv'\n")
+cat("Exploratory Data Analysis completed.\n")
