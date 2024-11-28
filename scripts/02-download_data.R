@@ -18,58 +18,62 @@ output_path <- "/home/rstudio/finalpaper/data/02-analysis_data/analysis_data.csv
 
 # Check if the source file exists
 if (!file.exists(file_path)) {
-  stop("Error: The specified file does not exist. Please ensure the simulated dataset is available at: ", file_path)
+  stop(paste0("Error: The specified file does not exist. Please ensure the simulated dataset is available at: ", file_path))
 }
 
 # Load the simulated dataset
 simulated_data <- read_csv(file_path)
 
-# Check and rename columns if necessary
-if (!"wti_price" %in% names(simulated_data)) {
-  message("The `wti_price` column is missing. Attempting to rename columns to match expected structure.")
-  print("Current column names:")
-  print(names(simulated_data))
-  
-  # Example of renaming (adjust based on your dataset's actual column names)
-  simulated_data <- simulated_data %>%
-    rename(
-      date = division,           # Replace with the actual column for dates
-      wti_price = state,         # Replace with the actual column for oil prices
-      election_phase = party     # Replace with the actual column for election phases
-    )
-  message("Column names have been updated.")
+# Check the structure of the dataset
+glimpse(simulated_data)
+
+# Ensure the dataset has the expected structure
+# Expected: A `date` column and a `wti_price` column
+# Handle column mismatches if necessary
+if (!all(c("date", "wti_price") %in% colnames(simulated_data))) {
+  stop("Error: The dataset does not contain the expected columns: 'date' and 'wti_price'.")
 }
+
+# Convert date to Date format (if not already) and handle non-numeric `wti_price`
+simulated_data <- simulated_data %>%
+  mutate(
+    date = as.Date(date),
+    wti_price = as.numeric(wti_price)
+  ) %>%
+  filter(!is.na(date) & !is.na(wti_price))
 
 # Data Cleaning and Enhancement
 analysis_data <- simulated_data %>%
-  # Handle missing values (if any)
-  filter(!is.na(date), !is.na(wti_price), !is.na(election_phase)) %>%
-  
-  # Add a new column for price changes (daily differences)
   arrange(date) %>%
+  
+  # Add a column for price changes (daily differences)
   mutate(
-    price_change = wti_price - lag(wti_price, default = NA),  # Calculate daily price change
-    price_change = round(price_change, 2)  # Round for readability
+    price_change = round(wti_price - lag(wti_price, default = NA), 2)
   ) %>%
   
   # Categorize prices into low, medium, and high price ranges
   mutate(
     price_category = case_when(
-      wti_price < 50 ~ "Low",
-      wti_price >= 50 & wti_price <= 80 ~ "Medium",
-      wti_price > 80 ~ "High"
+      wti_price < 68 ~ "Low",
+      wti_price >= 68 & wti_price < 70 ~ "Medium",
+      wti_price >= 70 ~ "High"
     )
   ) %>%
   
   # Create a flag for significant price changes (threshold: ±10 USD)
   mutate(
-    significant_change = ifelse(abs(price_change) >= 10, "Yes", "No")
+    significant_change = ifelse(abs(price_change) >= 2, "Yes", "No")
   ) %>%
   
   # Keep only relevant columns
-  select(date, wti_price, price_change, price_category, significant_change, election_phase)
+  select(date, wti_price, price_change, price_category, significant_change)
 
 # Save the enhanced dataset to the specified location
+output_dir <- dirname(output_path)
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir, recursive = TRUE)
+}
+
 write_csv(analysis_data, output_path)
 message("Enhanced dataset saved to: ", output_path)
 
