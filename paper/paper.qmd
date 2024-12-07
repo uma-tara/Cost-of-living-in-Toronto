@@ -8,183 +8,71 @@ date: today
 date-format: long
 abstract: "This paper analyzes the temporal, political, and economic influences on WTI crude oil prices during the 2024 U.S. Presidential Election. Using Bayesian regression, it explores the relationship between political events, daily market changes, and oil price trends. Results highlight significant effects of the election phase and temporal decline, while short-term fluctuations show limited predictive power."
 format: pdf
-number-sections: true
-bibliography: references.bib
+number-sections: false
+bibliography: /home/rstudio/finalpaper/paper/references.bib
 editor: 
+# This table of contents parameter was obtained from:
+# https://quarto.org/docs/reference/formats/pdf.html
+toc: true
   markdown: 
     wrap: 72
 ---
 
-```{r}
+```{r,echo=FALSE}
 #| include: false
 #| warning: false
 #| message: false
 
+x <- rnorm(100)
+mean(x)
 library(tidyverse)
 library(palmerpenguins)
 ```
 
-# Introduction
+# 1 Introduction
 
-The intersection of geopolitics, energy policy, and market dynamics
-underscores the critical need to explore the performance of Western
-Texas Intermediate (WTI) crude oil prices. The imposition of a proposed
-25% tariff on imports from Mexico and Canada, including oil, introduces
-a complex ripple effect on trade relationships, inflation, currency
-valuations, and broader economic indicators like GDP and interest rates.
-While these tariffs aim to exert negotiation leverage, their costs are
-unlikely to be absorbed by businesses and will instead be passed on to
-end consumers, increasing the price of goods and contributing to
-inflationary pressures. For Canada, a key oil exporter, the weakening of
-its dollar against the U.S. dollar could amplify these effects, further
-straining cross-border trade dynamics and economic cooperation.
+The intersection of geopolitics, energy policy, and market dynamics underscores the critical need to explore the performance of Western Texas Intermediate (WTI) crude oil prices. The imposition of a proposed 25% tariff on imports from Mexico and Canada, including oil, introduces a complex ripple effect on trade relationships, inflation, currency valuations, and broader economic indicators like GDP and interest rates. While these tariffs aim to exert negotiation leverage, their costs are unlikely to be absorbed by businesses and will instead be passed on to end consumers, increasing the price of goods and contributing to inflationary pressures. For Canada, a key oil exporter, the weakening of its dollar against the U.S. dollar could amplify these effects, further straining cross-border trade dynamics and economic cooperation.
 
-The context becomes even more significant when considering the oil
-industry’s role in U.S.-Mexico relations. President Trump’s focus on
-promoting domestic energy independence through policies like "drill,
-baby, drill" and removing regulatory barriers, alongside rhetoric about
-the U.S. being the "liquid gold" leader, positions oil as both an
-economic tool and a geopolitical instrument. At the same time, sanctions
-on Iranian and Venezuelan oil create tighter global markets, potentially
-bolstering U.S. exports to Southeast Asia while driving domestic
-production.
+The context becomes even more significant when considering the oil industry’s role in U.S.-Mexico relations. President Trump’s focus on promoting domestic energy independence through policies like "drill, baby, drill" and removing regulatory barriers, alongside rhetoric about the U.S. being the "liquid gold" leader, positions oil as both an economic tool and a geopolitical instrument. At the same time, sanctions on Iranian and Venezuelan oil create tighter global markets, potentially bolstering U.S. exports to Southeast Asia while driving domestic production.
 
-However, trade wars and tariffs pose risks to oil demand and broader
-economic stability. Retaliatory measures by Mexico and Canada could
-complicate energy exports, while the auto industry, a major consumer of
-petroleum products, may face significant disruptions from increased
-material costs. With tariffs not set to take effect until early 2025,
-governments and businesses face a window of uncertainty to negotiate or
-prepare for potential fallout.
+However, trade wars and tariffs pose risks to oil demand and broader economic stability. Retaliatory measures by Mexico and Canada could complicate energy exports, while the auto industry, a major consumer of petroleum products, may face significant disruptions from increased material costs. With tariffs not set to take effect until early 2025, governments and businesses face a window of uncertainty to negotiate or prepare for potential fallout.
 
-Amidst these dynamics, OPEC’s production cuts and the sustained low oil
-prices (hovering around \$72–\$75 per barrel) further complicate the
-outlook. Although U.S. producers have hedged against price volatility,
-the long-term sustainability of elevated production levels remains
-uncertain. This backdrop highlights the need to understand the variables
-influencing WTI crude oil prices, including election cycles, tariff
-policies, and global market forces, to better navigate the interplay
-between energy markets and economic policy.
+Amidst these dynamics, OPEC’s production cuts and the sustained low oil prices (hovering around \$72–\$75 per barrel) further complicate the outlook. Although U.S. producers have hedged against price volatility, the long-term sustainability of elevated production levels remains uncertain. This backdrop highlights the need to understand the variables influencing WTI crude oil prices, including election cycles, tariff policies, and global market forces, to better navigate the interplay between energy markets and economic policy.
 
-By exploring the temporal trends, election impacts, and daily
-fluctuations in WTI crude oil prices, this research seeks to shed light
-on the dynamics underpinning one of the most influential commodities in
-the global economy. Such insights are essential for informed
-decision-making in a world increasingly shaped by energy market
-transformations.
+By exploring the temporal trends, election impacts, and daily fluctuations in WTI crude oil prices, this research seeks to shed light on the dynamics underpinning one of the most influential commodities in the global economy. Such insights are essential for informed decision-making in a world increasingly shaped by energy market transformations.
 
-This statistical paper aims to analyze the factors influencing the
-performance of Western Texas Intermediate (WTI) crude oil prices, with a
-specific focus on the interplay between political events, market
-dynamics, and temporal trends. The primary objective is to model the
-daily price fluctuations of WTI crude oil using a combination of
-temporal, economic, and geopolitical predictors, including the date,
-election phase, and measures of short-term price changes. By
-incorporating these variables, the paper seeks to uncover patterns and
-relationships that offer insights into the drivers of oil price
-volatility and broader market behavior.
+This statistical paper aims to analyze the factors influencing the performance of Western Texas Intermediate (WTI) crude oil prices, with a specific focus on the interplay between political events, market dynamics, and temporal trends. The primary objective is to model the daily price fluctuations of WTI crude oil using a combination of temporal, economic, and geopolitical predictors, including the date, election phase, and measures of short-term price changes. By incorporating these variables, the paper seeks to uncover patterns and relationships that offer insights into the drivers of oil price volatility and broader market behavior.
 
-Western Texas Intermediate (WTI) is one of the three primary benchmarks
-for global crude oil pricing, alongside Brent crude and Dubai/Oman. It
-is considered the leading price reference for oil extracted and traded
-in North America, particularly due to its origin at Cushing, Oklahoma, a
-major hub for U.S. oil storage and distribution. WTI is widely regarded
-as a critical indicator of supply and demand dynamics not only within
-the U.S. but also globally, reflecting shifts in production levels,
-consumption patterns, geopolitical tensions, and broader economic
-trends.
+Western Texas Intermediate (WTI) is one of the three primary benchmarks for global crude oil pricing, alongside Brent crude and Dubai/Oman. It is considered the leading price reference for oil extracted and traded in North America, particularly due to its origin at Cushing, Oklahoma, a major hub for U.S. oil storage and distribution. WTI is widely regarded as a critical indicator of supply and demand dynamics not only within the U.S. but also globally, reflecting shifts in production levels, consumption patterns, geopolitical tensions, and broader economic trends.
 
-A significant component of this research is the exploration of the 2024
-U.S. Presidential Election as a potential inflection point in WTI
-prices. The election phase variable is included to investigate whether
-political transitions, particularly under a pro-oil administration,
-influence market confidence, production strategies, or regulatory
-outlooks. Additionally, the paper examines how short-term measures of
-market volatility- daily percentage changes and absolute price changes-
-relate to longer-term price movements.
+A significant component of this research is the exploration of the 2024 U.S. Presidential Election as a potential inflection point in WTI prices. The election phase variable is included to investigate whether political transitions, particularly under a pro-oil administration, influence market confidence, production strategies, or regulatory outlooks. Additionally, the paper examines how short-term measures of market volatility- daily percentage changes and absolute price changes- relate to longer-term price movements.
 
-The analysis is conducted using Bayesian regression techniques, offering
-a probabilistic framework to assess the uncertainty and significance of
-the predictors. The ultimate aim is to provide a robust statistical
-foundation for understanding the economic and political factors that
-shape crude oil markets, addressing both immediate price fluctuations
-and overarching trends. This research contributes to broader discussions
-about energy market dynamics, the impact of trade policies (like
-tariffs), and the intersection of geopolitical events with economic
-outcomes, offering valuable insights for policymakers, investors, and
-industry stakeholders.
+The analysis is conducted using Bayesian regression techniques, offering a probabilistic framework to assess the uncertainty and significance of the predictors. The ultimate aim is to provide a robust statistical foundation for understanding the economic and political factors that shape crude oil markets, addressing both immediate price fluctuations and overarching trends. This research contributes to broader discussions about energy market dynamics, the impact of trade policies (like tariffs), and the intersection of geopolitical events with economic outcomes, offering valuable insights for policymakers, investors, and industry stakeholders.
 
-This report investigates Crude Oil Prices: West Texas Intermediate (WTI)
-stock performance from the period of October 1st, 2024 (pre-election) to
-November 18th, 2024 (post-election).
+This report investigates Crude Oil Prices: West Texas Intermediate (WTI) stock performance from the period of October 1st, 2024 (pre-election) to November 18th, 2024 (post-election).
 
-Our findings indicate that factors like election phase and date numeric
-significantly predict fluctuations in WTI crude oil prices, while daily
-price change and absolute price change play a less substantial role. For
-the election phase, our analysis reveals a mean effect of -2.8 with a
-standard deviation of 1.1, indicating that WTI prices are \$2.8 lower on
-average during the pre-election phase compared to the post-election
-phase. The consistent negative effect, supported by the confidence
-interval, highlights the influence of elections on market pricing.
+Our findings indicate that factors like election phase and date numeric significantly predict fluctuations in WTI crude oil prices, while daily price change and absolute price change play a less substantial role. For the election phase, our analysis reveals a mean effect of -2.8 with a standard deviation of 1.1, indicating that WTI prices are \$2.8 lower on average during the pre-election phase compared to the post-election phase. The consistent negative effect, supported by the confidence interval, highlights the influence of elections on market pricing.
 
-For date numeric, the mean effect is -0.2 with a standard deviation of
-0.0, suggesting that WTI prices decrease by \$0.2 per day on average.
-While small, this downward trend is statistically significant, capturing
-a gradual decline in prices over time.
+For date numeric, the mean effect is -0.2 with a standard deviation of 0.0, suggesting that WTI prices decrease by \$0.2 per day on average. While small, this downward trend is statistically significant, capturing a gradual decline in prices over time.
 
-In contrast, daily percentage change has a mean of 0.5 and a standard
-deviation of 1.5. The small coefficient, with a credible interval
-spanning zero, suggests no strong or consistent relationship between
-daily percentage changes and overall price levels. Similarly, for
-absolute price change, the mean effect is -0.3 with a standard deviation
-of 2.0, indicating that its influence on WTI prices is not statistically
-significant, as the credible interval includes both positive and
-negative values.
+In contrast, daily percentage change has a mean of 0.5 and a standard deviation of 1.5. The small coefficient, with a credible interval spanning zero, suggests no strong or consistent relationship between daily percentage changes and overall price levels. Similarly, for absolute price change, the mean effect is -0.3 with a standard deviation of 2.0, indicating that its influence on WTI prices is not statistically significant, as the credible interval includes both positive and negative values.
 
-These findings collectively emphasize the importance of temporal and
-political factors in shaping crude oil prices, while short-term
-fluctuations appear to have limited predictive value.
+These findings collectively emphasize the importance of temporal and political factors in shaping crude oil prices, while short-term fluctuations appear to have limited predictive value.
 
-Our analysis reveals several noteworthy patterns in WTI crude oil price
-dynamics. Notably, prices are systematically lower during the
-pre-election phase compared to the post-election phase, suggesting the
-influence of market uncertainties or anticipatory sentiment tied to the
-electoral cycle. In contrast, short-term fluctuations, whether measured
-as daily percentage changes or absolute price changes, exhibit high
-variability but lack a consistent relationship with overall price
-levels. The model's robust fit, supported by convergence diagnostics
-(Rhat = 1) and strong alignment between observed and predicted values,
-underscores the reliability of these findings and provides a solid
-foundation for further exploration of the factors shaping crude oil
-markets.
+Our analysis reveals several noteworthy patterns in WTI crude oil price dynamics. Notably, prices are systematically lower during the pre-election phase compared to the post-election phase, suggesting the influence of market uncertainties or anticipatory sentiment tied to the electoral cycle. In contrast, short-term fluctuations, whether measured as daily percentage changes or absolute price changes, exhibit high variability but lack a consistent relationship with overall price levels. The model's robust fit, supported by convergence diagnostics (Rhat = 1) and strong alignment between observed and predicted values, underscores the reliability of these findings and provides a solid foundation for further exploration of the factors shaping crude oil markets.
 
-Telegraphing paragraph: The remainder of this paper is structured as
-follows. @sec-data....
+Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
 
-# Data {#sec-data}
+# 2 Data {#sec-data}
 
-## 2.1 Overview
+# 2.1 Overview
 
-For this analysis, we used the R programming language (R Core Team,
-2023) to explore the stock performance of Western Texas Intermediate
-(WTI) crude oil, based in Cushing, Oklahoma. The dataset, sourced from
-the St. Louis Federal Reserve's FRED database, provides historical daily
-price data for WTI crude oil, spanning a defined period. This dataset
-offers a rich basis for understanding crude oil price trends, short-term
-fluctuations, and broader market behaviors, all of which are crucial in
-the context of energy economics. WTI crude oil prices are widely
-considered a benchmark in the global energy market and have significant
-implications for financial markets, geopolitical stability, and
-macroeconomic policy.
+For this analysis, we used the R programming language (R Core Team, 2023) to explore the stock performance of Western Texas Intermediate (WTI) crude oil, based in Cushing, Oklahoma. The dataset, sourced from the St. Louis Federal Reserve's FRED database, provides historical daily price data for WTI crude oil, spanning a defined period. This dataset offers a rich basis for understanding crude oil price trends, short-term fluctuations, and broader market behaviors, all of which are crucial in the context of energy economics. WTI crude oil prices are widely considered a benchmark in the global energy market and have significant implications for financial markets, geopolitical stability, and macroeconomic policy.
 
-The dataset includes key variables such as wti_price, which represents
-the daily closing price of WTI crude oil in USD, and date, a timestamp
-of each observation. To better capture the dynamics of crude oil price
-movements, additional variables were constructed during preprocessing.
-These include:
+The dataset includes key variables such as wti_price, which represents the daily closing price of WTI crude oil in USD, and date, a timestamp of each observation. To better capture the dynamics of crude oil price movements, additional variables were constructed during preprocessing. These include:
 
-```{r}
-# Load necessary libraries
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
 library(tidyverse)
 library(knitr)
 
@@ -226,166 +114,51 @@ summary_stats %>%
 
 Table 1. Summary Statistics of Key Variables in the Analysis.
 
-This information is significant because it serves as a stand-in for
-comprehending how the energy industry affects the overall economy.
-Policymakers, investors, and economists must pay close attention to WTI
-crude oil prices because they have an impact on inflation, currency
-valuations, trade balances, and industrial costs. Since WTI is a product
-that is mostly sold in US dollars, changes in its price have
-geopolitical ramifications that impact the economies of both countries
-that produce and import oil.
+This information is significant because it serves as a stand-in for comprehending how the energy industry affects the overall economy. Policymakers, investors, and economists must pay close attention to WTI crude oil prices because they have an impact on inflation, currency valuations, trade balances, and industrial costs. Since WTI is a product that is mostly sold in US dollars, changes in its price have geopolitical ramifications that impact the economies of both countries that produce and import oil.
 
-The FRED database was used for this analysis because of its
-accessibility, extensive historical coverage, and reputation for
-dependability, even though equivalent statistics are available from
-other sources like Bloomberg or the U.S. Energy Information
-Administration (EIA).
+The FRED database was used for this analysis because of its accessibility, extensive historical coverage, and reputation for dependability, even though equivalent statistics are available from other sources like Bloomberg or the U.S. Energy Information Administration (EIA).
 
-Calculating percentage and absolute price changes, classifying
-observations by election phase, and transforming the date variable to
-numeric form for modeling were examples of high-level pre-processing
-tasks. Pre-processing preserved the dataset's integrity and pertinence
-to the study objectives while guaranteeing that it was prepared for
-Bayesian regression analysis.
+Calculating percentage and absolute price changes, classifying observations by election phase, and transforming the date variable to numeric form for modeling were examples of high-level pre-processing tasks. Pre-processing preserved the dataset's integrity and pertinence to the study objectives while guaranteeing that it was prepared for Bayesian regression analysis.
 
-The analysis's main focus is wti_price, which represents the Western
-Texas Intermediate (WTI) daily closing prices. The date was used to find
-systematic changes and infer temporal trends. The metrics price_change
-and daily_pct_change are used to measure short-term market volatility.
-election_phase was added to investigate how political events could
-affect prices.
+The analysis's main focus is wti_price, which represents the Western Texas Intermediate (WTI) daily closing prices. The date was used to find systematic changes and infer temporal trends. The metrics price_change and daily_pct_change are used to measure short-term market volatility. election_phase was added to investigate how political events could affect prices.
 
-## 2.2 Measurement
+# 2.2 Measurement
 
-To comprehend how actual economic and geopolitical events are converted
-into structured data within the dataset on Western Texas Intermediate
-(WTI) crude oil prices, a detailed discussion of measurement is required
-for this project. Key elements of the global oil market, including
-supply-demand dynamics, geopolitical events, and short-term market
-volatility, are reflected in the dataset and are methodically recorded
-and categorized.
+To comprehend how actual economic and geopolitical events are converted into structured data within the dataset on Western Texas Intermediate (WTI) crude oil prices, a detailed discussion of measurement is required for this project. Key elements of the global oil market, including supply-demand dynamics, geopolitical events, and short-term market volatility, are reflected in the dataset and are methodically recorded and categorized.
 
-The collection starts with the WTI crude oil daily closing prices, which
-are taken from the FRED database maintained by the St. Louis Federal
-Reserve. Real-time trends in crude oil markets are reflected in these
-pricing statistics, which are impacted by sanctions, geopolitical
-events, global economic conditions, and OPEC output decisions.
+The collection starts with the WTI crude oil daily closing prices, which are taken from the FRED database maintained by the St. Louis Federal Reserve. Real-time trends in crude oil markets are reflected in these pricing statistics, which are impacted by sanctions, geopolitical events, global economic conditions, and OPEC output decisions.
 
-To facilitate a structured analysis, several key variables were
-constructed within the dataset. The wti_price variable represents the
-daily closing price of WTI crude oil in USD, serving as the primary
-dependent variable. date_numeric provides a numeric representation of
-the date, tracking the number of days since the dataset's inception,
-enabling temporal trend analysis. daily_pct_change measures the
-percentage change in price relative to the previous day, capturing
-day-to-day market volatility, while price_change represents the absolute
-dollar change from the previous day, offering an alternative measure of
-short-term price shifts. Lastly, election_phase categorizes the data
-into "pre-election" and "post-election" periods surrounding the 2024
-U.S. Presidential Election, allowing for an examination of political
-cycles' effects on crude oil performance.
+To facilitate a structured analysis, several key variables were constructed within the dataset. The wti_price variable represents the daily closing price of WTI crude oil in USD, serving as the primary dependent variable. date_numeric provides a numeric representation of the date, tracking the number of days since the dataset's inception, enabling temporal trend analysis. daily_pct_change measures the percentage change in price relative to the previous day, capturing day-to-day market volatility, while price_change represents the absolute dollar change from the previous day, offering an alternative measure of short-term price shifts. Lastly, election_phase categorizes the data into "pre-election" and "post-election" periods surrounding the 2024 U.S. Presidential Election, allowing for an examination of political cycles' effects on crude oil performance.
 
-These variables collectively provide a systematic framework to quantify
-crude oil price behaviour and assess their responsiveness to underlying
-economic and political drivers. This approach enables a deeper
-understanding of the dynamic factors shaping the global energy market.
+These variables collectively provide a systematic framework to quantify crude oil price behaviour and assess their responsiveness to underlying economic and political drivers. This approach enables a deeper understanding of the dynamic factors shaping the global energy market.
 
-The dataset was generated with a number of important variables to aid in
-a systematic study. The main dependent variable is the wti_price
-variable, which is the daily closing price of WTI crude oil in USD.
-Temporal trend analysis is made possible by date_numeric, which gives a
-numeric representation of the date and counts the days since the
-dataset's creation. While price_change shows the absolute dollar change
-from the previous day, providing an alternate measure of short-term
-price movements, daily_pct_change measures the percentage change in
-price relative to the previous day, capturing day-to-day market
-volatility. In order to examine the impact of political cycles on crude
-oil performance, election_phase lastly divides the data into
-"pre-election" and "post-election" phases surrounding the 2024 U.S.
-Presidential Election.
+The dataset was generated with a number of important variables to aid in a systematic study. The main dependent variable is the wti_price variable, which is the daily closing price of WTI crude oil in USD. Temporal trend analysis is made possible by date_numeric, which gives a numeric representation of the date and counts the days since the dataset's creation. While price_change shows the absolute dollar change from the previous day, providing an alternate measure of short-term price movements, daily_pct_change measures the percentage change in price relative to the previous day, capturing day-to-day market volatility. In order to examine the impact of political cycles on crude oil performance, election_phase lastly divides the data into "pre-election" and "post-election" phases surrounding the 2024 U.S. Presidential Election.
 
-Together, these factors offer a methodical framework for measuring the
-evolution of crude oil prices and evaluating how responsive they are to
-underlying political and economic factors.
+Together, these factors offer a methodical framework for measuring the evolution of crude oil prices and evaluating how responsive they are to underlying political and economic factors.
 
-The Federal Reserve Economic Data (FRED) database, which aggregates,
-verifies, and standardizes unprocessed market data, is the primary
-source of the dataset, which shows a careful data collection method.
-Daily WTI crude oil prices provide a real-time picture of market
-circumstances and are based on trading activity on key exchanges.
+The Federal Reserve Economic Data (FRED) database, which aggregates, verifies, and standardizes unprocessed market data, is the primary source of the dataset, which shows a careful data collection method. Daily WTI crude oil prices provide a real-time picture of market circumstances and are based on trading activity on key exchanges.
 
-Notwithstanding its advantages, the dataset's ability to accurately
-reflect the complex variables affecting crude oil prices is limited.
-Although they are not specifically represented, speculative trading
-activities like the use of futures contracts are implicitly captured.
-Likewise, unreported occurrences such as abrupt changes in geopolitics
-or unreported production adjustments might affect pricing in ways that
-are difficult for structured datasets to capture. Although the
-election_phase variable is helpful for examining political impacts, it
-oversimplifies complicated political processes into two main
-categories—pre-election and post-election—and may miss more nuanced
-market responses to changes in laws or regulations. These
-representational issues draw attention to areas in which the dataset
-might not accurately reflect the complex dynamics of the crude oil
-market.
+Notwithstanding its advantages, the dataset's ability to accurately reflect the complex variables affecting crude oil prices is limited. Although they are not specifically represented, speculative trading activities like the use of futures contracts are implicitly captured. Likewise, unreported occurrences such as abrupt changes in geopolitics or unreported production adjustments might affect pricing in ways that are difficult for structured datasets to capture. Although the election_phase variable is helpful for examining political impacts, it oversimplifies complicated political processes into two main categories—pre-election and post-election—and may miss more nuanced market responses to changes in laws or regulations. These representational issues draw attention to areas in which the dataset might not accurately reflect the complex dynamics of the crude oil market.
 
-## 2.3 Outcome Variable
+# 2.3 Outcome Variable
 
-The outcome of interest in this analysis is the daily closing price of
-Western Texas Intermediate (WTI) crude oil, denoted as wti_price. This
-variable, measured in U.S. dollars, serves as a critical indicator of
-the performance and valuation of crude oil in the global market. It
-reflects real-time market dynamics, capturing the interplay between
-supply and demand, geopolitical events, and broader economic trends.
+The outcome of interest in this analysis is the daily closing price of Western Texas Intermediate (WTI) crude oil, denoted as wti_price. This variable, measured in U.S. dollars, serves as a critical indicator of the performance and valuation of crude oil in the global market. It reflects real-time market dynamics, capturing the interplay between supply and demand, geopolitical events, and broader economic trends.
 
-Along with Brent Crude and Dubai/Oman, WTI crude oil is one of the three
-main benchmarks for world oil prices. The Cushing, Oklahoma hub, a
-crucial hub for the storage and delivery of oil in the United States,
-has a direct impact on its pricing. Particularly for light, sweet crude
-oil types, the WTI price affects global pricing dynamics and serves as a
-benchmark for North American oil markets (EIA 2023).
+Along with Brent Crude and Dubai/Oman, WTI crude oil is one of the three main benchmarks for world oil prices. The Cushing, Oklahoma hub, a crucial hub for the storage and delivery of oil in the United States, has a direct impact on its pricing. Particularly for light, sweet crude oil types, the WTI price affects global pricing dynamics and serves as a benchmark for North American oil markets (EIA 2023).
 
-Crude oil is a fungible commodity, therefore changes in supply and
-demand have a significant impact on its price. While excess brought on
-by increasing production, as occurs during OPEC's strategic output
-expansions, tends to reduce prices, a spike in demand from major
-economies like China and India frequently drives prices higher. WTI
-prices are a trustworthy predictor of patterns in global energy use
-since they nearly instantly reflect these equilibria (Hamilton 2009).
+Crude oil is a fungible commodity, therefore changes in supply and demand have a significant impact on its price. While excess brought on by increasing production, as occurs during OPEC's strategic output expansions, tends to reduce prices, a spike in demand from major economies like China and India frequently drives prices higher. WTI prices are a trustworthy predictor of patterns in global energy use since they nearly instantly reflect these equilibria (Hamilton 2009).
 
-The data shows that WTI prices exhibit notable variability over time,
-influenced by both short-term fluctuations and longer-term trends. For
-instance, price levels may respond to daily market volatility, such as
-changes in inventory levels or production decisions by OPEC, as well as
-to more gradual shifts, such as those tied to election cycles or broader
-economic growth. This underscores the importance of understanding the
-factors driving WTI prices, as they have far-reaching implications for
-energy markets, inflation, and economic stability.
+The data shows that WTI prices exhibit notable variability over time, influenced by both short-term fluctuations and longer-term trends. For instance, price levels may respond to daily market volatility, such as changes in inventory levels or production decisions by OPEC, as well as to more gradual shifts, such as those tied to election cycles or broader economic growth. This underscores the importance of understanding the factors driving WTI prices, as they have far-reaching implications for energy markets, inflation, and economic stability.
 
-By focusing on this outcome variable, this analysis seeks to uncover the
-key predictors influencing crude oil prices, such as temporal trends
-(date_numeric), election-related effects (election_phase), and
-short-term changes in market performance (daily_pct_change and
-price_change). The variability in this outcome highlights the complexity
-of oil markets and the need for a robust statistical framework to
-disentangle the effects of these interrelated factors.
+By focusing on this outcome variable, this analysis seeks to uncover the key predictors influencing crude oil prices, such as temporal trends (date_numeric), election-related effects (election_phase), and short-term changes in market performance (daily_pct_change and price_change). The variability in this outcome highlights the complexity of oil markets and the need for a robust statistical framework to disentangle the effects of these interrelated factors.
 
-## 2.4 Predictor Variables
+# 2.4 Predictor Variables
 
-Numerous factors that are thought to affect WTI crude oil prices
-(wti_price) are captured by the predictors included in this analysis.
-These variables offer a thorough framework for analyzing changes in the
-price of oil by representing market, political, and temporal dynamics. A
-thorough explanation of each predictor is provided below, along with
-graphics showing their distributions and connections to the outcome
-variable.
+Numerous factors that are thought to affect WTI crude oil prices (wti_price) are captured by the predictors included in this analysis. These variables offer a thorough framework for analyzing changes in the price of oil by representing market, political, and temporal dynamics. A thorough explanation of each predictor is provided below, along with graphics showing their distributions and connections to the outcome variable.
 
-date_numeric represents the number of days since the start of the
-dataset, serving as a measure of time. This variable captures the
-long-term trend in WTI prices, reflecting gradual increases or decreases
-over the observation period.
+date_numeric represents the number of days since the start of the dataset, serving as a measure of time. This variable captures the long-term trend in WTI prices, reflecting gradual increases or decreases over the observation period.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 
@@ -428,18 +201,11 @@ print(scatter_plot)
 
 Figure 1. Scatterplot of WTI Prices Over Time with Linear Trend Line.
 
-A systematic decline in crude oil prices over the research period is
-suggested by a scatterplot of wti_price against date_numeric (Figure 1),
-which displays a distinct downward trend over time. Understanding the
-temporal dynamics of oil markets is possible thanks to this
-characteristic.
+A systematic decline in crude oil prices over the research period is suggested by a scatterplot of wti_price against date_numeric (Figure 1), which displays a distinct downward trend over time. Understanding the temporal dynamics of oil markets is possible thanks to this characteristic.
 
-The dataset is divided into two eras by the categorical variable
-election_phase: "pre-election" (before to the 2024 U.S. Presidential
-Election) and "post-election" (after the election). This variable is
-used to look into how political events could affect WTI prices.
+The dataset is divided into two eras by the categorical variable election_phase: "pre-election" (before to the 2024 U.S. Presidential Election) and "post-election" (after the election). This variable is used to look into how political events could affect WTI prices.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 
@@ -482,20 +248,13 @@ print(boxplot_plot)
 
 ```
 
-Figure 2. Boxplot of WTI Prices Across Pre-Election and Post-Election
-Phases.
+Figure 2. Boxplot of WTI Prices Across Pre-Election and Post-Election Phases.
 
-A boxplot (Figure 2) compares wti_price distributions across the two
-election phases. The pre-election phase shows consistently lower median
-prices compared to the post-election phase, highlighting a possible
-relationship between political cycles and market confidence.
+A boxplot (Figure 2) compares wti_price distributions across the two election phases. The pre-election phase shows consistently lower median prices compared to the post-election phase, highlighting a possible relationship between political cycles and market confidence.
 
-daily_pct_change measures the percentage change in WTI price relative to
-the previous day. This variable captures short-term market volatility,
-reflecting rapid fluctuations influenced by supply-demand dynamics,
-geopolitical events, or speculative trading.
+daily_pct_change measures the percentage change in WTI price relative to the previous day. This variable captures short-term market volatility, reflecting rapid fluctuations influenced by supply-demand dynamics, geopolitical events, or speculative trading.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 
@@ -527,16 +286,11 @@ print(histogram_plot)
 
 Figure 3. Histogram of Daily Percentage Changes in WTI Prices.
 
-A histogram (Figure 3) shows the distribution of daily_pct_change,
-centered around zero with a wide spread. This variability highlights the
-often unpredictable nature of short-term oil price movements.
+A histogram (Figure 3) shows the distribution of daily_pct_change, centered around zero with a wide spread. This variability highlights the often unpredictable nature of short-term oil price movements.
 
-price_change represents the absolute dollar change in WTI price from one
-day to the next. As an alternative measure of volatility, this variable
-complements daily_pct_change by focusing on the magnitude of price
-movements rather than their relative scale.
+price_change represents the absolute dollar change in WTI price from one day to the next. As an alternative measure of volatility, this variable complements daily_pct_change by focusing on the magnitude of price movements rather than their relative scale.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 
@@ -568,39 +322,17 @@ print(density_plot)
 
 Figure 4. Density Plot of Absolute Price Changes in WTI Prices.
 
-The distribution of price_change is depicted in a density plot (Figure
-4). The data reflects the episodic character of major market occurrences
-with a fairly symmetric distribution around zero and sporadic
-substantial movements.
+The distribution of price_change is depicted in a density plot (Figure 4). The data reflects the episodic character of major market occurrences with a fairly symmetric distribution around zero and sporadic substantial movements.
 
-The inclusion of each predictor is based on how well it explains
-wti_price, but it's also important to consider how they interact. For
-instance, election_phase may interact with temporal trends
-(date_numeric) to enhance or reduce price movements at particular
-periods, while daily_pct_change and price_change are anticipated to
-represent distinct aspects of market volatility.
+The inclusion of each predictor is based on how well it explains wti_price, but it's also important to consider how they interact. For instance, election_phase may interact with temporal trends (date_numeric) to enhance or reduce price movements at particular periods, while daily_pct_change and price_change are anticipated to represent distinct aspects of market volatility.
 
-Together, these predictors provide a strong framework for comprehending
-the intricate dynamics of WTI crude oil prices, which serves as the
-basis for the statistical modeling used in this investigation. Appendix
-A offers summary data tables and visualizations for these predictors for
-additional study. The data shows a roughly symmetric distribution
-centered around zero, with occasional large shifts, reflecting the
-episodic nature of significant market events.
+Together, these predictors provide a strong framework for comprehending the intricate dynamics of WTI crude oil prices, which serves as the basis for the statistical modeling used in this investigation. Appendix A offers summary data tables and visualizations for these predictors for additional study. The data shows a roughly symmetric distribution centered around zero, with occasional large shifts, reflecting the episodic nature of significant market events.
 
-## 2.5 Associations between variables
+# 2.5 Associations between variables
 
-Figure 5 illustrates the percentage of WTI price categories ("Low,"
-"Medium," and "High") throughout the "pre-election" and "post-election"
-phases, which sheds light on how price distributions change during these
-times. The dataset counts the occurrences of each pricing category and
-is classified by election_phase. To standardize the counts, proportions
-are computed for every election phase. For clarity, each category is
-given a different hue. To visualize the proportions, use
-geom_bar(position = "fill") to generate a stacked proportional bar
-chart.
+Figure 5 illustrates the percentage of WTI price categories ("Low," "Medium," and "High") throughout the "pre-election" and "post-election" phases, which sheds light on how price distributions change during these times. The dataset counts the occurrences of each pricing category and is classified by election_phase. To standardize the counts, proportions are computed for every election phase. For clarity, each category is given a different hue. To visualize the proportions, use geom_bar(position = "fill") to generate a stacked proportional bar chart.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 
@@ -652,63 +384,33 @@ print(price_category_plot)
 
 ```
 
-Figure 5. Proportional Distribution of WTI Price Categories Across
-Election Phases.
+Figure 5. Proportional Distribution of WTI Price Categories Across Election Phases.
 
-## 3 Model
+# 3 Model
 
-# 3.1 Model set-up
+## 3.1 Model set-up
 
-To investigate the factors influencing WTI crude oil price fluctuations,
-this study utilizes daily data spanning October 1 to November 18, 2024.
-The dataset includes the WTI price, calculated daily percentage changes,
-absolute price changes, and a numeric representation of the date. The
-election phase variable is constructed to distinguish between
-pre-election (October 1–November 4) and post-election (November 5–18)
-periods.
+To investigate the factors influencing WTI crude oil price fluctuations, this study utilizes daily data spanning October 1 to November 18, 2024. The dataset includes the WTI price, calculated daily percentage changes, absolute price changes, and a numeric representation of the date. The election phase variable is constructed to distinguish between pre-election (October 1–November 4) and post-election (November 5–18) periods.
 
-A Bayesian linear regression model is employed with WTI price ((y_i)) as
-the dependent variable and the predictors: date numeric ((x_1)),
-election phase ((x_2)), daily percentage change ((x_3)), and absolute
-price change ((x_4)):
+A Bayesian linear regression model is employed with WTI price ((y_i)) as the dependent variable and the predictors: date numeric ((x_1)), election phase ((x_2)), daily percentage change ((x_3)), and absolute price change ((x_4)):
 
-A Bayesian linear regression model is employed with WTI price ((y_i)) as
-the dependent variable and the predictors: date numeric ((x_1)),
-election phase ((x_2)), daily percentage change ((x_3)), and absolute
-price change ((x_4)):
+## Bayesian Linear Regression Model
 
-\[ y_i \sim \mathcal{N}(\mu\_i, \sigma\^2) \]
+The Bayesian linear regression model is specified as follows:
 
-\[ \mu\_i = \beta\_0 + \beta*1 x*{1i} + \beta*2 x*{2i} + \beta*3
-x*{3i} + \beta*4 x*{4i} \]
+```{=latex}
+\begin{align}
+y_i &\sim \text{N}(\mu_i, \sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \beta_4 x_{4i} \\
+\beta_0, \beta_1, \beta_2, \beta_3, \beta_4 &\sim \text{N}(0, 2.5) \\
+\sigma &\sim \text{Exponential}(1)
+\end{align}
+```
+## 3.2 Model justification
 
-\[ \beta\_0, \beta\_1, \beta\_2, \beta\_3, \beta\_4 \sim \mathcal{N}(0,
-2.5) \]
+The Bayesian framework offers a probabilistic approach to quantify uncertainty in parameter estimates and assess the significance of predictors in shaping WTI price fluctuations. This approach is particularly suited to capturing the complexity of crude oil markets influenced by intertwined economic, political, and temporal factors. By incorporating election phase and temporal trends as predictors, the model directly addresses the impact of political transitions and sustained trends on price levels. Measures of short-term market volatility (daily percentage and absolute price changes) are included to evaluate their predictive contribution, allowing for a nuanced exploration of both systematic and immediate price drivers.
 
-\[ \sigma \sim \text{Exponential}(1) \]
-
-Here, (\mathcal{N}) represents the normal distribution, and the priors
-on the coefficients ((\beta)) are normal distributions centered at 0
-with a standard deviation of 2.5. The variance parameter ((\sigma)) is
-given an exponential prior with a rate of 1. The model leverages
-informative priors to ensure robust estimation while accounting for
-parameter uncertainty.
-
-# 3.2 Model justification
-
-The Bayesian framework offers a probabilistic approach to quantify
-uncertainty in parameter estimates and assess the significance of
-predictors in shaping WTI price fluctuations. This approach is
-particularly suited to capturing the complexity of crude oil markets
-influenced by intertwined economic, political, and temporal factors. By
-incorporating election phase and temporal trends as predictors, the
-model directly addresses the impact of political transitions and
-sustained trends on price levels. Measures of short-term market
-volatility (daily percentage and absolute price changes) are included to
-evaluate their predictive contribution, allowing for a nuanced
-exploration of both systematic and immediate price drivers.
-
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 install.packages("DiagrammeR")
 library(DiagrammeR)
 
@@ -734,17 +436,15 @@ digraph causal_model {
 ")
 ```
 
-Figure 6. Causal relationships between predictors (Election Phase, Date
-Numeric, etc.) and the dependent variable (WTI Price).
+Figure 6. Causal relationships between predictors (Election Phase, Date Numeric, etc.) and the dependent variable (WTI Price).
 
-## 4 Results
+# 4 Results
 
-In this section, we visualized our data through graphs and tables as
-well as present the results from our model.
+In this section, we visualized our data through graphs and tables as well as present the results from our model.
 
-# 4.1.1. Election phase and price dynamics
+## 4.1 Election phase and price dynamics
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 library(gt)
@@ -791,51 +491,23 @@ summary_stats %>%
 
 ```
 
-Figure 7. Summary Statistics of WTI Prices by Election Phase: Mean,
-Median, and Range.
+Figure 7. Summary Statistics of WTI Prices by Election Phase: Mean, Median, and Range.
 
-Elections are often accompanied by increased market uncertainty,
-particularly regarding future trade, energy policies, and geopolitical
-relationships. These uncertainties can depress market confidence and
-impact crude oil prices.
+Elections are often accompanied by increased market uncertainty, particularly regarding future trade, energy policies, and geopolitical relationships. These uncertainties can depress market confidence and impact crude oil prices.
 
-For example, concerns about potential shifts in U.S. energy policy,
-including tariffs or sanctions, could drive anticipatory price
-adjustments in the market. As election results define the political
-environment and give markets time to stabilize and adapt to expected
-policies, the post-election period typically signifies a period of
-decreased uncertainty. Restoring investor confidence may result in
-higher prices if political parties or administrations place a strong
-emphasis on domestic energy independence, whether through overt
-messaging or policy signals.
+For example, concerns about potential shifts in U.S. energy policy, including tariffs or sanctions, could drive anticipatory price adjustments in the market. As election results define the political environment and give markets time to stabilize and adapt to expected policies, the post-election period typically signifies a period of decreased uncertainty. Restoring investor confidence may result in higher prices if political parties or administrations place a strong emphasis on domestic energy independence, whether through overt messaging or policy signals.
 
-A strong dollar negatively impacts oil prices since oil is traded in
-dollars, making it more expensive for foreign buyers. According to
-analysts, the initial concerns about oversupply caused by Trump's
-initiatives were exaggerated. While John Kilduff (Again Capital)
-observes that the market has adjusted following initial over-reactions,
-Phil Flynn (Price Futures Group) sees additional upside possibilities in
-the near term.
+A strong dollar negatively impacts oil prices since oil is traded in dollars, making it more expensive for foreign buyers. According to analysts, the initial concerns about oversupply caused by Trump's initiatives were exaggerated. While John Kilduff (Again Capital) observes that the market has adjusted following initial over-reactions, Phil Flynn (Price Futures Group) sees additional upside possibilities in the near term.
 
-# 4.1.2. Daily Volatility and Price Changes
+## 4.2 Daily Volatility and Price Changes
 
-Oil prices fell more than 1% on Wednesday, November 6th, after Donald
-Trump was elected president of the United States. The main cause of this
-decline was the strengthening of the US dollar, which hit its highest
-level since March 2023.
+Oil prices fell more than 1% on Wednesday, November 6th, after Donald Trump was elected president of the United States. The main cause of this decline was the strengthening of the US dollar, which hit its highest level since March 2023.
 
-Besides the WTI, Brent crude oil futures were also down \$1.00, 0r 1.32
-percent, at \$74.53 per barrel by 1040 GMT, while U.S. West Texas
-Intermediate (WTI) crude fell 93 cents, or 1.29 percent, to \$71 per
-barrel.
+Besides the WTI, Brent crude oil futures were also down \$1.00, 0r 1.32 percent, at \$74.53 per barrel by 1040 GMT, while U.S. West Texas Intermediate (WTI) crude fell 93 cents, or 1.29 percent, to \$71 per barrel.
 
-UBS analyst Giovanni Staunovo said, "A Trump presidency has a bearish
-spin. Tariffs would be negative for economic growth and oil demand
-growth. However, Trump could renew sanctions on Iran and Venezuela,
-removing barrels from the market, which would be bullish.” Iran exports
-about 1.3 million barrels per day.
+UBS analyst Giovanni Staunovo said, "A Trump presidency has a bearish spin. Tariffs would be negative for economic growth and oil demand growth. However, Trump could renew sanctions on Iran and Venezuela, removing barrels from the market, which would be bullish.” Iran exports about 1.3 million barrels per day.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 
@@ -883,14 +555,11 @@ print(density_plot)
 
 ```
 
-Figure 8 and 9. Comparison of the Distribution of Daily Percentage
-Changes in WTI Prices Across Election Phases and Density Plot
-Highlighting Daily Percentage Changes in WTI Prices During Pre- and
-Post-Election Phases.
+Figure 8 and 9. Comparison of the Distribution of Daily Percentage Changes in WTI Prices Across Election Phases and Density Plot Highlighting Daily Percentage Changes in WTI Prices During Pre- and Post-Election Phases.
 
-# 4.1.3 Temporal trends
+## 4.3 Temporal trends
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 
@@ -924,35 +593,17 @@ print(scatter_plot)
 
 ```
 
-Figure 10. Scatter Plot of WTI Prices Over Time with a Linear Regression
-Line.
+Figure 10. Scatter Plot of WTI Prices Over Time with a Linear Regression Line.
 
-The Middle East conflict may cause supply disruptions for oil, which
-would drive up prices. Trump's backing of Israel could make things more
-unstable in the region. Bullish conditions could result from the removal
-of large output (such as Iran's 3.2 million barrels per day) from the
-market if Trump decides to prolong the sanctions.
+The Middle East conflict may cause supply disruptions for oil, which would drive up prices. Trump's backing of Israel could make things more unstable in the region. Bullish conditions could result from the removal of large output (such as Iran's 3.2 million barrels per day) from the market if Trump decides to prolong the sanctions.
 
-Analysts point out that Iran has mastered the art of dodging sanctions,
-which may lessen its effect. With enduring problems including refinery
-margins, declining demand, and inefficiencies impacting market dynamics,
-OPEC+ continues to play a crucial role in regulating world supply.
-Beyond geopolitical uncertainty, analysts like Rystad Energy's Mukesh
-Sahdev stress that fundamental market trends like refinery margins,
-OPEC+ control, and trade inefficiencies are crucial in determining the
-future paths of oil prices.
+Analysts point out that Iran has mastered the art of dodging sanctions, which may lessen its effect. With enduring problems including refinery margins, declining demand, and inefficiencies impacting market dynamics, OPEC+ continues to play a crucial role in regulating world supply. Beyond geopolitical uncertainty, analysts like Rystad Energy's Mukesh Sahdev stress that fundamental market trends like refinery margins, OPEC+ control, and trade inefficiencies are crucial in determining the future paths of oil prices.
 
-# 4.1.4. Model Coefficients and Predictive Insights
+## 4.4 Model Coefficients and Predictive Insights
 
-The article "Understanding and interpreting confidence and credible
-intervals around effect estimates" by Hespanhol et al. (2019) provides
-insights into the interpretation of credible intervals within Bayesian
-statistics. A credible interval represents a range within which an
-unobserved parameter value lies with a certain probability, given the
-observed data and prior information. This probabilistic interpretation
-directly quantifies uncertainty about the parameter.
+The article "Understanding and interpreting confidence and credible intervals around effect estimates" by Hespanhol et al. (2019) provides insights into the interpretation of credible intervals within Bayesian statistics. A credible interval represents a range within which an unobserved parameter value lies with a certain probability, given the observed data and prior information. This probabilistic interpretation directly quantifies uncertainty about the parameter.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide', fig.show='hold'}
 # Load necessary libraries
 library(tidyverse)
 library(rstanarm)
@@ -964,11 +615,11 @@ data_path <- "/home/rstudio/finalpaper/data/02-analysis_data/analysis_data.csv"
 # Load and preprocess the data
 analysis_data <- read_csv(data_path) %>%
   mutate(
-    date = as.Date(date),  # Ensure the date column is in Date format
-    date_numeric = as.numeric(date - min(date, na.rm = TRUE)),  # Convert dates to numeric for plotting
+    date = as.Date(date),
+    date_numeric = as.numeric(date - min(date, na.rm = TRUE)),
     election_phase = ifelse(date < as.Date("2024-11-05"), "Pre-Election", "Post-Election"),
-    election_phase = as.factor(election_phase),  # Convert to factor
-    daily_pct_change = (price_change / lag(wti_price)) * 100  # Calculate daily percentage change
+    election_phase = as.factor(election_phase),
+    daily_pct_change = (price_change / lag(wti_price)) * 100
   )
 
 # Fit a Bayesian regression model
@@ -989,7 +640,7 @@ posterior_samples <- as.matrix(wti_price_model)
 mcmc_areas_plot <- mcmc_areas(
   posterior_samples,
   pars = c("(Intercept)", "date_numeric", "election_phasePre-Election", "daily_pct_change", "price_change"),
-  prob = 0.8  # 80% credible intervals
+  prob = 0.8
 ) +
   labs(
     title = "Posterior Distributions of Key Coefficients",
@@ -998,18 +649,14 @@ mcmc_areas_plot <- mcmc_areas(
   ) +
   theme_minimal()
 
-# Save the plot as a PNG file
-ggsave("mcmc_areas_plot.png", mcmc_areas_plot, width = 8, height = 6)
-
 # Display the plot
 print(mcmc_areas_plot)
 
 ```
 
-Figure 11. Posterior Distributions of Key Coefficients with 80% Credible
-Intervals
+Figure 11. Posterior Distributions of Key Coefficients with 80% Credible Intervals
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide', fig.show='hold'}
 # Load necessary libraries
 library(tidyverse)
 library(rstanarm)
@@ -1065,9 +712,9 @@ print(results_table)
 
 Figure 12. Full set of outputted results
 
-# 4.1.5. Posterior Predictive Checks
+## 4.5 Posterior Predictive Checks
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide', fig.show='hold'}
 # Load necessary libraries
 library(tidyverse)
 library(rstanarm)
@@ -1121,12 +768,11 @@ ggsave("posterior_predictive_check.png", pp_check_plot, width = 8, height = 6)
 print(pp_check_plot)
 ```
 
-Figure 13. Graph of posterior predictive checks comparing observed and
-predicted WTI prices.
+Figure 13. Graph of posterior predictive checks comparing observed and predicted WTI prices.
 
-## 4.2 Model Results
+## Model Results
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load necessary libraries
 library(bayesplot)
 library(tidyverse)
@@ -1166,136 +812,45 @@ print(coef_plot)
 
 Figure 15. Coefficient Plot with Credible Intervals.
 
-When all predictor variables are at their baseline or reference levels,
-the intercept (B0) shows the average expected price of West Texas
-Intermediate (WTI) crude oil. For example, the baseline levels match the
-reference categories or mean values of the predictors, depending on the
-kind of variable, if the model incorporates predictors such as market
-demand, production levels, and geopolitical stability.
+When all predictor variables are at their baseline or reference levels, the intercept (B0) shows the average expected price of West Texas Intermediate (WTI) crude oil. For example, the baseline levels match the reference categories or mean values of the predictors, depending on the kind of variable, if the model incorporates predictors such as market demand, production levels, and geopolitical stability.
 
-In this instance, the intercept value of \$77.9 indicates that when the
-predictors are at these baseline levels, the expected WTI price is
-approximately \$77.9. This serves as a starting point for the model’s
-predictions, and deviations from this value are explained by the other
-predictors in the model.
+In this instance, the intercept value of \$77.9 indicates that when the predictors are at these baseline levels, the expected WTI price is approximately \$77.9. This serves as a starting point for the model’s predictions, and deviations from this value are explained by the other predictors in the model.
 
-The degree to which the observed values differ from the intercept's
-predicted values is indicated by the Mean Absolute Deviation (MAD). A
-low MAD, as in this case, reflects minimal variability, indicating that
-the model is suitably stable in estimating this baseline price. This
-stability is crucial for building confidence in the model's overall
-predictive power, as a highly variable intercept might signal issues
-like model misspecification or insufficient data quality.
+The degree to which the observed values differ from the intercept's predicted values is indicated by the Mean Absolute Deviation (MAD). A low MAD, as in this case, reflects minimal variability, indicating that the model is suitably stable in estimating this baseline price. This stability is crucial for building confidence in the model's overall predictive power, as a highly variable intercept might signal issues like model misspecification or insufficient data quality.
 
-An average daily decline of \$0.2 in WTI prices is indicated by the
-predicted coefficient for the numeric representation of dates (B1),
-which is -0.2. This negative trend indicates a general temporal fall in
-prices across the observation period, which may have been caused by more
-general economic issues and increased market hesitancy as a result of
-Trump's frequent remarks about speculative tariffs. The gradual decline
-in oil prices over time seems to be a result of these factors.
+An average daily decline of \$0.2 in WTI prices is indicated by the predicted coefficient for the numeric representation of dates (B1), which is -0.2. This negative trend indicates a general temporal fall in prices across the observation period, which may have been caused by more general economic issues and increased market hesitancy as a result of Trump's frequent remarks about speculative tariffs. The gradual decline in oil prices over time seems to be a result of these factors.
 
-The coefficient for daily percentage changes (B3) is small, estimated at
-0.5, with a relatively large mean absolute deviation (MAD) of 1.5. This
-suggests that while daily market volatility exists, its predictive power
-for overall price levels is limited. The wide variability in this
-predictor indicates that short-term fluctuations may not have a
-consistent or significant impact on WTI prices.
+The coefficient for daily percentage changes (B3) is small, estimated at 0.5, with a relatively large mean absolute deviation (MAD) of 1.5. This suggests that while daily market volatility exists, its predictive power for overall price levels is limited. The wide variability in this predictor indicates that short-term fluctuations may not have a consistent or significant impact on WTI prices.
 
-With large credible intervals, the coefficient for daily absolute price
-changes (B4) is -0.3, which is close to zero. Individual daily price
-changes may not have a substantial or consistent impact on overall price
-levels, according to this weak correlation. The large gaps emphasize
-even more how difficult it is to assign this variable any meaningful
-significance.
+With large credible intervals, the coefficient for daily absolute price changes (B4) is -0.3, which is close to zero. Individual daily price changes may not have a substantial or consistent impact on overall price levels, according to this weak correlation. The large gaps emphasize even more how difficult it is to assign this variable any meaningful significance.
 
-The model diagnostics, including measures like R2 and the mean posterior
-predictive distribution (mean_PPD), indicate excellent convergence and
-stability, with all R2 values equal to 1. Posterior predictive checks
-confirm strong alignment between observed and predicted price
-distributions, affirming the model's ability to capture key patterns and
-trends in the data.
+The model diagnostics, including measures like R2 and the mean posterior predictive distribution (mean_PPD), indicate excellent convergence and stability, with all R2 values equal to 1. Posterior predictive checks confirm strong alignment between observed and predicted price distributions, affirming the model's ability to capture key patterns and trends in the data.
 
-## 5 Limitations and Next Steps
+# 5 Limitations and Next Steps
 
 # 5.1 Limitations
 
-The dataset comprises only 32 observations, limiting its capacity to
-capture long-term trends and seasonal patterns in WTI crude oil prices.
-Such a brief timeframe may result in biased estimates, especially for
-predictors like date_numeric, which could indicate a gradual decline
-over time.
+The dataset comprises only 32 observations, limiting its capacity to capture long-term trends and seasonal patterns in WTI crude oil prices. Such a brief timeframe may result in biased estimates, especially for predictors like date_numeric, which could indicate a gradual decline over time.
 
-To uncover underlying patterns, time series analysis breaks down data
-into trend, seasonality, and residual components. However, this
-decomposition is hampered by an inadequate dataset, making it difficult
-to precisely identify and model these components. As a result, the model
-can miss important trends, producing inaccurate predictions.
+To uncover underlying patterns, time series analysis breaks down data into trend, seasonality, and residual components. However, this decomposition is hampered by an inadequate dataset, making it difficult to precisely identify and model these components. As a result, the model can miss important trends, producing inaccurate predictions.
 
-According to study published in the Journal of Time Series Econometrics,
-sufficient data length is crucial for efficient time series
-decomposition. Ollech (2021), for example, addresses the difficulties of
-correcting daily time series data for seasonal effects in "Seasonal
-Adjustment of Daily Time Series," emphasizing that incomplete data can
-make it difficult to accurately estimate seasonal and trend components.
+According to study published in the Journal of Time Series Econometrics, sufficient data length is crucial for efficient time series decomposition. Ollech (2021), for example, addresses the difficulties of correcting daily time series data for seasonal effects in "Seasonal Adjustment of Daily Time Series," emphasizing that incomplete data can make it difficult to accurately estimate seasonal and trend components.
 
-Adding interaction terms could improve the model's interpretability and
-forecast performance by better reflecting the intricacy of the
-underlying processes. Election_phase and daily_pct_change, for example,
-may not have a strictly additive connection. An election's phase may
-interact with other elements, such geopolitical events or economic data,
-to increase or decrease market volatility. For instance, increased
-political unpredictability during crucial election periods may cause
-investor concern to cause inflated daily percentage changes in the
-market. The model runs the danger of oversimplifying these dynamics and
-missing how the interaction of various variables influences market
-behavior if such interaction effects are ignored.
+Adding interaction terms could improve the model's interpretability and forecast performance by better reflecting the intricacy of the underlying processes. Election_phase and daily_pct_change, for example, may not have a strictly additive connection. An election's phase may interact with other elements, such geopolitical events or economic data, to increase or decrease market volatility. For instance, increased political unpredictability during crucial election periods may cause investor concern to cause inflated daily percentage changes in the market. The model runs the danger of oversimplifying these dynamics and missing how the interaction of various variables influences market behavior if such interaction effects are ignored.
 
-The model ignores external factors like global oil demand, OPEC+
-decisions, and macroeconomic indices like GDP or inflation in favour of
-concentrating only on a small number of predictors. Since these factors
-have a big impact on oil prices, leaving them out could confuse the
-links that are shown. A more thorough knowledge of price changes may be
-obtained by including these factors in the model. Ignoring them could
-result in omitted variable bias, which would skew the estimated effects
-of the predictors that are included.
+The model ignores external factors like global oil demand, OPEC+ decisions, and macroeconomic indices like GDP or inflation in favour of concentrating only on a small number of predictors. Since these factors have a big impact on oil prices, leaving them out could confuse the links that are shown. A more thorough knowledge of price changes may be obtained by including these factors in the model. Ignoring them could result in omitted variable bias, which would skew the estimated effects of the predictors that are included.
 
-The posterior predictive distribution (mean_PPD) of the model only
-roughly fits the observed data, despite the fact that R2 values show
-high convergence. This raises the possibility of missing explanatory
-variables or problems with model formulation.
+The posterior predictive distribution (mean_PPD) of the model only roughly fits the observed data, despite the fact that R2 values show high convergence. This raises the possibility of missing explanatory variables or problems with model formulation.
 
 # 5.2 Next Seps
 
-Expand the dataset to include observations spanning multiple election
-cycles and periods of economic volatility. The many temporal and
-political factors affecting WTI pricing would be more accurately
-captured by wider temporal coverage. The investigation of trends over
-long periods of time may also be enhanced by the inclusion of time
-series data with fixed effects for time and country.
+Expand the dataset to include observations spanning multiple election cycles and periods of economic volatility. The many temporal and political factors affecting WTI pricing would be more accurately captured by wider temporal coverage. The investigation of trends over long periods of time may also be enhanced by the inclusion of time series data with fixed effects for time and country.
 
-Include interaction terms to examine how political events affect market
-reactions, such as between election_phase and daily_pct_change. The
-model's explanatory strength and predictive accuracy may be enhanced by
-such interaction effects, which could reveal intricate interactions
-between predictors. One could also improve the model by adding external
-factors like the demand for crude oil around the world, OPEC+ production
-choices, and macroeconomic metrics like GDP growth or inflation. These
-elements would offer crucial background information, allowing for a more
-thorough examination of price swings in relation to larger market and
-geopolitical issues.
+Include interaction terms to examine how political events affect market reactions, such as between election_phase and daily_pct_change. The model's explanatory strength and predictive accuracy may be enhanced by such interaction effects, which could reveal intricate interactions between predictors. One could also improve the model by adding external factors like the demand for crude oil around the world, OPEC+ production choices, and macroeconomic metrics like GDP growth or inflation. These elements would offer crucial background information, allowing for a more thorough examination of price swings in relation to larger market and geopolitical issues.
 
-Uncertainty in predictors with broad credible intervals could be better
-taken into account by modifying the priors or adding hierarchical
-structures. These improvements may improve the accuracy of predictions
-for short-term market volatility forecasters. To thoroughly assess model
-fit and pinpoint areas in need of development, carry out extra posterior
-predictive assessments, such as residual diagnostics.
+Uncertainty in predictors with broad credible intervals could be better taken into account by modifying the priors or adding hierarchical structures. These improvements may improve the accuracy of predictions for short-term market volatility forecasters. To thoroughly assess model fit and pinpoint areas in need of development, carry out extra posterior predictive assessments, such as residual diagnostics.
 
-Run simulations under fictitious conditions, such as increased sanctions
-on Iran or significant OPEC+ output cuts. Actionable insights into the
-possible effects of particular geopolitical or economic events on WTI
-prices could be obtained from these simulations.
+Run simulations under fictitious conditions, such as increased sanctions on Iran or significant OPEC+ output cuts. Actionable insights into the possible effects of particular geopolitical or economic events on WTI prices could be obtained from these simulations.
 
 # Appendix {.unnumbered}
 
@@ -1305,15 +860,11 @@ Data and graph sketches can be found in this report’s GitHub Repository.
 
 ## A.2 R Scripts
 
-Scripts with code used for simulation, testing, downloading, data
-cleaning, modelling, replicating and exploratory data analysis can be
-found in this report’s GitHub Repository. The R programming language (R
-Core Team 2023) as well as the tidyverse package (Wickham et al. 2019)
-were used to test the real and simulated data.
+Scripts with code used for simulation, testing, downloading, data cleaning, modelling, replicating and exploratory data analysis can be found in this report’s GitHub Repository. The R programming language (R Core Team 2023) as well as the tidyverse package (Wickham et al. 2019) were used to test the real and simulated data.
 
 ## A.3 Additional Plots
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 #### Load data ####
 analysis_data <- read_csv("/home/rstudio/finalpaper/data/02-analysis_data/analysis_data.csv")
 
@@ -1333,7 +884,7 @@ print(wti_time_plot)
 
 Figure 16. WTI Prices Over Time.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 #### 2. Histogram of WTI Prices ####
 wti_histogram <- ggplot(analysis_data, aes(x = wti_price)) +
   geom_histogram(binwidth = 5, fill = "steelblue", color = "black") +
@@ -1350,7 +901,7 @@ print(wti_histogram)
 
 Figure 17. Histogram of WTI Prices.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 #### 3. Boxplot to Detect Outliers ####
 wti_boxplot <- ggplot(analysis_data, aes(y = wti_price)) +
   geom_boxplot(fill = "lightgreen") +
@@ -1366,7 +917,7 @@ print(wti_boxplot)
 
 Figure 18. Boxplot to Detect Outliers.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 #### 4. Monthly Average Prices ####
 analysis_data_monthly <- analysis_data %>%
   mutate(month = floor_date(date, "month")) %>%
@@ -1388,7 +939,7 @@ print(monthly_avg_plot)
 
 Figure 19. Monthly Average Prices.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 #### 6. Daily Percentage Change in Prices ####
 analysis_data <- analysis_data %>%
   mutate(daily_pct_change = 100 * (wti_price - lag(wti_price)) / lag(wti_price))
@@ -1408,7 +959,7 @@ print(daily_pct_change_plot)
 
 Figure 20. Daily Percentage Change in Prices.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 #### 7. Boxplot by Election Phase ####
 election_date <- as.Date("2024-11-05")
 analysis_data <- analysis_data %>%
@@ -1433,170 +984,68 @@ print(election_phase_boxplot)
 
 Figure 21. Boxplot by Election Phase.
 
-## A.4 Posterior Predictive Check
+## A.4 R Convergence and Diagnostics Plot
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# Load necessary libraries
+library(tidyverse)
+library(rstanarm)
+library(bayesplot)
 
-\section{Posterior Predictive Check}
+# File path to the data
+data_path <- "/home/rstudio/finalpaper/data/02-analysis_data/analysis_data.csv"
 
-Posterior predictive checks are an essential diagnostic tool for
-assessing how well the fitted Bayesian model aligns with the observed
-data. Figure\~\ref{fig:ppcheck} provides a visual comparison of the
-observed and predicted distributions, helping to evaluate the model's
-ability to capture the variability and central tendencies of the data.
+# Load and preprocess the data
+analysis_data <- read_csv(data_path) %>%
+  mutate(
+    date = as.Date(date),  # Ensure the date column is in Date format
+    date_numeric = as.numeric(date - min(date, na.rm = TRUE)),  # Convert date to numeric
+    election_phase = ifelse(date < as.Date("2024-11-05"), "Pre-Election", "Post-Election"),
+    election_phase = as.factor(election_phase),  # Convert to factor
+    daily_pct_change = ifelse(!is.na(lag(wti_price)) & lag(wti_price) != 0,
+                              (price_change / lag(wti_price)) * 100, NA)  # Calculate daily percentage change
+  )
 
-```{=tex}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{path_to_ppcheck_plot.png}
-    \caption{Posterior predictive check comparing observed and predicted distributions of WTI prices. The shaded region represents the variability captured by the model.}
-    \label{fig:ppcheck}
-\end{figure}
+# Fit a Bayesian regression model
+wti_price_model <- stan_glm(
+  formula = wti_price ~ date_numeric + election_phase + daily_pct_change + price_change,
+  data = analysis_data,
+  family = gaussian(),
+  prior = normal(location = 0, scale = 2.5, autoscale = TRUE),
+  prior_intercept = normal(location = 0, scale = 2.5, autoscale = TRUE),
+  prior_aux = exponential(rate = 1, autoscale = TRUE),
+  seed = 853
+)
+
+# Diagnostics: Trace plots
+trace_plot <- mcmc_trace(as.array(wti_price_model)) +
+  labs(
+    title = "Trace Plot for Model Convergence",
+    x = "Iteration",
+    y = "Parameter Value"
+  ) +
+  theme_minimal()
+
+# Diagnostics: R-hat values
+rhat_plot <- mcmc_rhat(rhat(wti_price_model)) +
+  labs(
+    title = "R-hat Diagnostic for Model Parameters",
+    subtitle = "R-hat values close to 1 indicate convergence",
+    x = "Parameters",
+    y = "R-hat Value"
+  ) +
+  theme_minimal()
+
+# Save the plots as PNG files
+ggsave("trace_plot.png", trace_plot, width = 8, height = 6)
+ggsave("rhat_plot.png", rhat_plot, width = 8, height = 6)
+
+# Display the plots
+print(trace_plot)
+print(rhat_plot)
+
 ```
-In addition to checking the predictive fit, we also compare the
-posterior distributions of the key model parameters with their priors to
-assess how much information the data contributed to the posterior
-estimates. Figure\~\ref{fig:priorvsposterior} demonstrates this
-comparison, where significant shifts between the prior and posterior
-indicate strong updates driven by the observed data.
-
-```{=tex}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{path_to_prior_vs_posterior_plot.png}
-    \caption{Comparison of posterior and prior distributions for key model parameters. The posterior distributions are updated based on observed data, reflecting evidence-driven inferences.}
-    \label{fig:priorvsposterior}
-\end{figure}
-```
-Overall, these diagnostic checks confirm that the model is
-well-calibrated, capturing the observed data's essential features while
-allowing for meaningful inference about key predictors.
-
-## A.5 Diagnostics
-
-\section{Diagnostics}
-
-To ensure the validity of the Bayesian model, we assess convergence and
-sampling quality using diagnostic plots. Figure\~\ref{fig:diagnostics}
-presents two key diagnostics: a trace plot and an (\hat{R}) plot. These
-plots help verify whether the Markov Chain Monte Carlo (MCMC) sampling
-process has converged and whether the posterior estimates are reliable.
-
-```{=tex}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.45\textwidth]{path_to_trace_plot.png}
-    \includegraphics[width=0.45\textwidth]{path_to_rhat_plot.png}
-    \caption{Checking the convergence of the MCMC algorithm. (Left) The trace plot shows the sampling paths for the model's key parameters across iterations. (Right) The \(\hat{R}\) plot indicates convergence metrics for each parameter.}
-    \label{fig:diagnostics}
-\end{figure}
-```
-\subsection{Trace Plot}
-
-The trace plot in Figure\~\ref{fig:diagnostics} (left) illustrates the
-sampling paths for key parameters across the MCMC iterations. The
-well-mixed and stationary paths indicate that the sampler has explored
-the posterior distribution efficiently. This suggests that the chains
-have converged and the samples are representative of the target
-posterior distribution.
-
-\subsection{\(\hat{R}\) Plot}
-
-The (\hat{R}) plot in Figure\~\ref{fig:diagnostics} (right) shows the
-potential scale reduction factor ((\hat{R})) for each parameter. All
-(\hat{R}) values are close to 1, indicating that the chains have
-converged and there are no issues with mixing or insufficient sampling.
-These results confirm the stability and reliability of the posterior
-estimates.
+Figure 22. Trace plot and rhat plot.
 
 \newpage
 
 # References
-
-@book{alexander2023telling, title = {Telling Stories with Data}, author
-= {Rohan Alexander}, year = {2023}, publisher = {CRC Press}, address =
-{Boca Raton}, url = {https://tellingstorieswithdata.com/} }
-
-@article{arelbundock2022modelsummary, title = {Modelsummary: Data and
-Model Summaries in R}, author = {Vincent Arel-Bundock}, journal =
-{Journal of Statistical Software}, volume = {103}, number = {1}, pages =
-{1--23}, year = {2022}, doi = {10.18637/jss.v103.i01} }
-
-@misc{journal_time_series, title = {Journal of Time Series
-Econometrics}, publisher = {Berkeley Electronic Press}, address =
-{Berkeley, CA}, year = {2008} }
-
-@article{hespanhol2018confidence, title = {Understanding and
-Interpreting Confidence and Credible Intervals around Effect Estimates},
-author = {Luiz Hespanhol and Caio Sain Vallio and Lucíola Menezes Costa
-and Bruno T. Saragiotto}, journal = {Brazilian Journal of Physical
-Therapy}, volume = {23}, number = {4}, pages = {290--301}, year =
-{2018}, doi = {10.1016/j.bjpt.2018.12.006} }
-
-@misc{eia2024wti, title = {Crude Oil Prices: West Texas Intermediate
-(WTI) - Cushing, Oklahoma \[DCOILWTICO\]}, author = {U.S. Energy
-Information Administration}, note = {Retrieved from FRED, Federal
-Reserve Bank of St. Louis. Accessed December 3, 2024}, url =
-{https://fred.stlouisfed.org/series/DCOILWTICO} }
-
-@article{sharma2024trump, title = {Donald Trump’s Presidency Will Likely
-Boost U.S. Oil Output in 2025}, author = {Gaurav Sharma}, journal =
-{Forbes}, year = {2024}, note = {November 6, 2024}, url =
-{https://www.forbes.com/sites/gauravsharma/2024/11/06/donald-trumps-presidency-will-likely-boost-us-oil-output-in-2025/}
-}
-
-@misc{trump2024tariffs, title = {Energy Experts Think Donald Trump Will
-Make Tariff Exemptions for Canadian Oil}, author = {Donald Trump},
-journal = {CTVNews}, year = {2024}, note = {November 14, 2024}, url =
-{https://www.ctvnews.ca/politics/energy-experts-think-donald-trump-will-make-tariff-exemptions-for-canadian-oil-1.7109771}
-}
-
-@misc{cnbc2024oil, title = {Oil Markets' Future Still Uncertain under
-Donald Trump after Election Win}, author = {CNBC}, year = {2024}, note =
-{November 6, 2024}, url =
-{https://www.cnbc.com/2024/11/06/oil-markets-future-still-uncertain-under-donald-trump-after-election-win.html}
-}
-
-@misc{lefebvre2024oil, title = {Will Trump’s Win Be a Pyrrhic Victory
-for the Oil Industry?}, author = {Ben Lefebvre}, journal = {Politico},
-year = {2024}, note = {November 7, 2024}, url =
-{https://www.politico.com/news/2024/11/07/trump-win-pyrrhic-victory-for-oil-industry-00187559}
-}
-
-@misc{king2024tariffs, title = {Republicans Praise Trump Tariff Threat
-as Smart ‘Negotiating Strategy’ as He Looks to Tackle Fentanyl, Border
-Crises}, author = {Ryan King and Josh Christenson}, journal = {New York
-Post}, year = {2024}, note = {November 27, 2024}, url =
-{https://nypost.com/2024/11/26/us-news/republicans-praise-trump-tariff-threat-as-smart-negotiating-strategy/?utm_source=chatgpt.com}
-}
-
-@misc{bloomberg2024energy, title = {From Oil to EVs, Here’s What a Trump
-Victory Means for Energy}, author = {Bloomberg News}, journal =
-{Financial Post}, year = {2024}, note = {November 6, 2024}, url =
-{https://financialpost.com/commodities/energy/from-oil-to-evs-heres-what-a-trump-victory-means-for-energy}
-}
-
-@misc{guardian2024fundraising, title = {Trump's Oil and Gas Fundraising
-Surges Ahead of Election}, journal = {The Guardian}, year = {2024}, note
-= {October 18, 2024}, url =
-{https://www.theguardian.com/us-news/2024/oct/18/election-trump-oil-gas-fundraising}
-}
-
-@article{baumeister2013oilshocks, title = {Time-varying effects of oil
-supply shocks on the US economy}, author = {Baumeister, C. and Peersman,
-G.}, journal = {American Economic Journal: Macroeconomics}, volume =
-{5}, number = {4}, pages = {1--28}, year = {2013} }
-
-@article{hamilton2009oilshock, title = {Causes and consequences of the
-oil shock of 2007-08}, author = {Hamilton, J. D.}, journal = {Brookings
-Papers on Economic Activity}, volume = {2009}, number = {1}, pages =
-{215--261}, year = {2009} }
-
-@inbook{hamilton2011resources, title = {Oil prices, exhaustible
-resources, and economic growth}, author = {Hamilton, J. D.}, booktitle =
-{Handbook of Energy and Climate Change}, volume = {1}, pages = {29--56},
-year = {2011} }
-
-@article{kilian2014inventories, title = {The role of inventories and
-speculative trading in the global market for crude oil}, author =
-{Kilian, L. and Murphy, D. P.}, journal = {Journal of Applied
-Econometrics}, volume = {29}, number = {3}, pages = {454--478}, year =
-{2014} }
